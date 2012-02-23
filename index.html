@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Securing Your Django Site</title>
+    <link href="css/presentation-template.css" rel="stylesheet" />
+  </head>
+<body>
+
+  <div id="impress" class="impress-not-supported">
+
+    <!-- This should be hidden -->
+    <div class="fallback-message">
+      <p>Your browser <strong>doesn't support the features required</strong> by impress.js, so you are presented with a simplified version of this presentation.</p>
+    </div>
+
+    <div id="title" class="step slide" data-x="-1000" data-y="-1500">
+      <q>
+        <h1>Securing Your Django Site</h1>
+        <img src="img/django-pony.png" alt="Django Pony" />
+        <p class="footnote"><a href="https://djangosd.jottit.com/">DjangoSD</a> - February 22, 2012</p>
+      </q>
+    </div>
+
+
+    <!-- BASICS -->
+    <div id="web-security-basics-xss" class="slide step" data-x="0" data-y="500" data-scale="2">
+      <q>
+        <h2>Web security basics: XSS</h2>
+        <p class="monospace"><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">testview</span>(request):
+    t <span style="color: #666666">=</span> Template(<span style="color: #BA2121">&quot;Hello my name is {{ name }}&quot;</span>)
+    c <span style="color: #666666">=</span> Context({<span style="color: #BA2121">&#39;name&#39;</span>: <span style="color: #BA2121">&quot;&lt;script&gt;alert(&#39;owned&#39;)&lt;/script&gt;&quot;</span>})
+    <span style="color: #008000; font-weight: bold">return</span> HttpResponse(t<span style="color: #666666">.</span>render(c))
+        </p>
+      </q>
+    </div>
+
+    <div id="web-security-basics-xss-2" class="step" data-x="0" data-y="500" data-z="-10000" data-scale="1">
+      <q>
+        <img src="img/safe.png" alt="Safe!" />
+      </q>
+    </div>
+
+    <div id="web-security-basics-sql" class="slide step" data-x="2000" data-y="500" data-scale="2">
+      <q>
+        <h2>Web security basics: SQL Injection</h2>
+        <p class="monospace">Post<span style="color: #666666">.</span>objects<span style="color: #666666">.</span>get(name<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&#39;; DELETE FROM blog_post; --&quot;</span>)</p>
+        <img src="img/bobby_tables.png" alt="Obligatory XKCD" style="margin-top: 30px;"/>
+      </q>
+    </div>
+
+    <div id="web-security-basics-csrf" class="slide step" data-x="4000" data-y="500" data-scale="2">
+      <q>
+        <h2>Web security basics: CSRF</h2>
+        <p class="subtitle">Explaining CSRF in a one-liner is tough. <br />Bear with me...</p>
+      </q>
+      <img src="img/bear.png" style="width: 300px" />
+    </div>
+
+    <div id="web-security-basics-csrf-1" class="step" data-x="4000" data-y="500" data-z="-10000" data-scale="2">
+      <q>
+        <p class="monospace">&lt;img src="http://chase.com/xfer?from=you&amp;to=me&amp;amount=1000" /&gt;</p>
+      </q>
+    </div>
+
+    <div id="web-security-basics-gotchas" class="slide step" data-x="6000" data-y="500" data-scale="2">
+      <q>
+        <h2>This security thing is easy...</h2>
+        <img src="img/security_guard.png" alt="Security Guard" />
+      </q>
+    </div>
+
+    <div id="web-security-basics-gotchas-1" class="slide step" data-x="8000" data-y="500" data-scale="2">
+      <q>
+        <h2>Double check your exceptions!</h2>
+        <p>
+          <span class="monospace">.raw()</span><br/>
+          <span class="monospace">.extra()</span><br/>
+          <span class="monospace">mark_safe()</span><br/>
+          <span class="monospace">@csrf_exempt</span>
+        </p>
+      </q>
+    </div>
+
+
+    <!-- The not so basics -->
+    <div id="not-so-basics-caching" class="slide step" data-x="0" data-y="4500" data-scale="4">
+      <q>
+        <h2>The Not-So-Basics: Caching</h2>
+        <p class="left" style="margin-bottom: 50px;">Is this safe?</p>
+        <p class="monospace"><span style="color: #AA22FF">@cache_page</span>(<span style="color: #666666">60</span> <span style="color: #666666">*</span> <span style="color: #666666">15</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">my_view</span>(request):
+    <span style="color: #666666">...</span></p>
+      </q>
+    </div>
+
+    <div id="not-so-basics-caching-1" class="slide step" data-x="5000" data-y="4500" data-scale="4">
+      <q>
+        <h2>Caching: It depends</h2>
+        <ul>
+          <li>Is your cache backend secure?</li>
+          <li>Shared host?</li>
+          <li>Are you using pickle?</li>
+        </ul>
+      </q>
+    </div>
+
+    <div id="side-note-pickle" class="step" data-x="5000" data-y="4500" data-z="-5000">
+      <q>
+        <img src="img/pickle.png" alt="Pickle, not just a fruit anymore" />
+        <p class="footer">The pickle module is not intended to be secure against erroneous or maliciously constructed data. Never unpickle data received from an untrusted or unauthenticated source.</p>
+      </q>
+    </div>
+
+    <div id="not-so-basics-passwords" class="slide step" data-x="10000" data-y="4500" data-scale="4">
+      <q>
+        <h2>The Not-So-Basics: Passwords</h2>
+        <img src="img/admin.png" alt="The familiar Django Admin" />
+      </q>
+    </div>
+
+    <div id="not-so-basics-passwords-1" class="slide step" data-x="15000" data-y="4500" data-scale="4">
+      <q>
+        <h2>Passwords (continued)</h2>
+        <ul>
+          <li>Password sniffing? (HTTPS)<li>
+          <li>No hashed passwords in public source control!</li>
+          <li>Improvements coming in <a href="https://docs.djangoproject.com/en/dev//releases/1.4/">Django 1.4</a></li>
+        </ul>
+      </q>
+    </div>
+
+    <div id="not-so-basics-misc" class="slide step" data-x="20000" data-y="4500" data-scale="4">
+      <q>
+        <h2>The Not-So-Basics: Misc</h2>
+        <img src="img/loic.png" alt="Our first catch of the day" style="float: right; width: 400px;" />
+        <ul>
+          <li><a href="https://docs.djangoproject.com/en/dev/ref/clickjacking/#clickjacking-prevention">Clickjacking</a><li>
+          <li><a href="https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY">SECRET_KEY</a><li>
+          <li><a href="https://docs.djangoproject.com/en/dev/ref/models/fields/#file-upload-security">Uploaded files</a><li>
+          <li>Denial of service<li>
+          <li>Shell injection</li>
+        </ul>
+      </q>
+    </div>
+
+    <div id="new-django-stuff" class="slide step" data-x="0" data-y="10000" data-scale="6">
+      <q>
+        <h2>New Django Features: Signing</h2>
+        <p style="margin-top: 200px;" class="monospace"><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">django.core.signing</span> <span style="color: #008000; font-weight: bold">import</span> TimestampSigner
+signer <span style="color: #666666">=</span> TimestampSigner()
+value <span style="color: #666666">=</span> signer<span style="color: #666666">.</span>sign(<span style="color: #BA2121">&#39;time sensitive&#39;</span>)</p>
+      </q>
+    </div>
+
+    <div id="new-django-stuff-1" class="step" data-x="0" data-y="10000" data-z="-3000">
+      <q>
+        <img src="img/sign.png" alt="You can still shoot yourself in the foot (or head)" />
+        <p class="footer">Did I mention to keep your SECRET_KEY a secret?</p>
+      </q>
+    </div>
+
+    <div id="securing-your-server-throttling" class="slide step" data-x="7000" data-y="10000" data-scale="6">
+      <q>
+        <h2>Securing Your Server</h2>
+        <ul>
+          <li>HTTPS: <a href="https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SESSION_COOKIE_SECURE">SESSION_COOKIE_SECURE</a></li>
+          <li>Uploaded files: <a href="http://httpd.apache.org/docs/2.2/mod/core.html#limitrequestbody">LimitRequestBody</a><li>
+          <li>Throttling: <a href="http://wiki.nginx.org/NginxHttpLimitReqModule">HttpLimitReqModule</a>, Apache modules</li>
+          <li>Firewalls: IPTables</li>
+        </ul>
+      </q>
+    </div>
+
+
+    <div id="helpful-tools" class="slide step" data-x="14000" data-y="10000" data-scale="6">
+      <q>
+        <h2>Tools to Secure Your Site</h2>
+        <ul>
+          <li>Django apps: <a href="https://github.com/carljm/django-secure/">django-secure</a></li>
+          <li>Web app firewalls: <a href="http://www.modsecurity.org/">mod-security</a></li>
+          <li>Port scanner: <a href="http://nmap.org/">nmap</a></li>
+        </ul>
+      </q>
+    </div>
+
+    <div id="end" class="step" data-x="0" data-y="20000" data-scale="2">
+      <q>
+        <h1>Thanks!</h1>
+        <p class="footer">https://docs.djangoproject.com/en/dev/topics/security/</p>
+      </q>
+    </div>
+
+  </div>
+    
+  <script type="text/javascript" src="js/impress.js"></script>
+  <script type="text/javascript">window.onload = function() { impress(); }</script>
+
+</body>
+</html>
